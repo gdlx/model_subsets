@@ -10,7 +10,7 @@ module ModelSubsets
   #
   # @since 0.0.2
   def fieldsets
-    subset_content[:fieldsets] if valid_subset? && subset_content.has_key?(:fieldsets)
+    subset_content[:fieldsets] if valid_subset?
   end
 
   # Whether subset includes a fieldset
@@ -27,24 +27,6 @@ module ModelSubsets
     fieldsets.include?(name) if valid_subset?
   end
 
-  # Return current subset as a Symbol
-  #
-  # @return [ Symbol ]
-  #
-  # @since 0.0.3
-  def subset
-    self[:subset].to_sym
-  end
-
-  # Sets current subset as string
-  #
-  # @param [ String, Symbol ] name The subset name
-  #
-  # @since 0.0.3
-  def subset= name
-    self[:subset] = name.to_s
-  end
-
   # Returns current subset content
   # An empty Hash is returned if subset is not defined
   #
@@ -52,7 +34,7 @@ module ModelSubsets
   #
   # @since 0.0.2
   def subset_content
-    return self.class.subsets[subset] if valid_subset? 
+    return self.class.subsets[subset.to_sym] if valid_subset? 
     {}
   end
 
@@ -77,7 +59,7 @@ module ModelSubsets
   #
   # @since 0.0.2
   def subset_fields
-    self.class.subset_fields subset
+    self.class.subset_fields subset.to_sym
   end
 
   # Whether current subset id is defined
@@ -89,7 +71,7 @@ module ModelSubsets
   #
   # @since 0.0.2
   def valid_subset?
-    return true if self.class.subsets.keys.include?(subset)
+    return true if self.class.subsets.keys.include?(subset.to_sym)
     errors.add(:subset, :invalid) if respond_to?(:errors)
     false
   end
