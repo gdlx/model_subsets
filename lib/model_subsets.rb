@@ -27,6 +27,24 @@ module ModelSubsets
     fieldsets.include?(name) if valid_subset?
   end
 
+  # Return current subset as a Symbol
+  #
+  # @return [ Symbol ]
+  #
+  # @since 0.0.3
+  def subset
+    self[:subset].to_sym
+  end
+
+  # Sets current subset as string
+  #
+  # @param [ String, Symbol ] name The subset name
+  #
+  # @since 0.0.3
+  def subset= name
+    self[:subset] = name.to_s
+  end
+
   # Returns current subset content
   # An empty Hash is returned if subset is not defined
   #
