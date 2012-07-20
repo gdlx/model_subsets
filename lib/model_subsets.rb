@@ -34,7 +34,7 @@ module ModelSubsets
   #
   # @since 0.0.2
   def subset_content
-    return self.class.subsets[subset.to_sym] if valid_subset? 
+    return self.class.subsets[subset.to_s.to_sym] if valid_subset? 
     {}
   end
 
@@ -59,7 +59,7 @@ module ModelSubsets
   #
   # @since 0.0.2
   def subset_fields
-    self.class.subset_fields subset.to_sym
+    self.class.subset_fields subset.to_s.to_sym
   end
 
   # Whether current subset id is defined
@@ -71,7 +71,7 @@ module ModelSubsets
   #
   # @since 0.0.2
   def valid_subset?
-    return true if self.class.subsets.keys.include?(subset.to_sym)
+    return true if self.class.subsets.keys.include?(subset.to_s.to_sym)
     errors.add(:subset, :invalid) if respond_to?(:errors)
     false
   end
