@@ -1,6 +1,7 @@
 module ModelSubsets
   module ClassMethods
 
+    # Creates a fieldset
     def fieldset *args
       fieldset = args.shift
       raise "fieldset id must be a Symbol (#{fieldset.class} given)" unless fieldset.is_a? Symbol
@@ -12,22 +13,23 @@ module ModelSubsets
       @fieldsets[fieldset] = args
     end
 
+    # Creates a subset
+    def subset subset, options = {}
+      raise "subset id must be a Symbol (#{subset.class} given)" unless subset.is_a? Symbol
+      raise "subset options must be a Hash (#{options.class} given)" unless options.is_a? Hash
+      @subsets_config ||= {}
+      @subsets_config[subset] = options
+    end
+
     # Provides subset fieldset list
     def subset_fieldset subset
-      return unless subsets.has_key? subset
+      return unless subsets.has_key?(subset) && subsets[subset].has_key?(:fieldsets)
       subset_fields = []
       subsets[subset][:fieldsets].each do |fieldset|
         fieldset       = @fieldsets[fieldset].is_a?(Array) ? @fieldsets[fieldset] : [@fieldsets[fieldset]]
         subset_fields |= fieldset
       end
       subset_fields.uniq
-    end
-
-    def subset subset, options = {}
-      raise "subset id must be a Symbol (#{subset.class} given)" unless subset.is_a? Symbol
-      raise "subset options must be a Hash (#{options.class} given)" unless options.is_a? Hash
-      @subsets_config ||= {}
-      @subsets_config[subset] = options
     end
 
     # Provides subsets with builded extends & fieldsets
@@ -39,6 +41,7 @@ module ModelSubsets
       return @subsets unless @subsets.blank? || options[:purge]
 
       @subsets = {}
+      @scopes  = {}
 
       @subsets_config.each do |subset, options|
         # Can't define same subset twice
@@ -64,7 +67,7 @@ module ModelSubsets
 
         else
           # Include all fieldsets by default
-          options[:fieldsets] = @fieldsets.keys
+          options[:fieldsets] = @fieldsets.keys unless options[:fieldsets].is_a? Array
         end
 
         # Handle inclusion list
@@ -77,6 +80,13 @@ module ModelSubsets
         if options[:except]
           options[:except]     = [options[:except]] unless options[:except].is_a? Array
           options[:fieldsets] -= options[:except]
+        end
+
+        # Handle scopes
+        options[:scopes] = [options[:scopes]] unless options[:scopes].is_a? Array
+        options[:scopes].each do |scope|
+          @scopes[scope] ||= []
+          @scopes[scope] << subset
         end
 
         # Cleanup

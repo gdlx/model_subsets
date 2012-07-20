@@ -14,4 +14,7 @@ Gem::Specification.new do |gem|
   gem.name          = "model_subsets"
   gem.require_paths = ["lib"]
   gem.version       = ModelSubsets::VERSION
+
+  gem.add_dependency("activemodel", ["~> 3.1"])
+  
 end
