@@ -34,8 +34,7 @@ module ModelSubsets
   #
   # @since 0.0.2
   def subset_content
-    return self.class.subsets[subset.to_s.to_sym] if valid_subset? 
-    {}
+    self.class.subsets[subset.to_sym] if valid_subset? 
   end
 
   # Whether a subset fieldset includes a field
@@ -59,7 +58,7 @@ module ModelSubsets
   #
   # @since 0.0.2
   def subset_fields
-    self.class.subset_fields subset.to_s.to_sym
+    self.class.subset_fields(subset.to_sym) if valid_subset?
   end
 
   # Whether current subset id is defined
