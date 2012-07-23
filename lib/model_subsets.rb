@@ -27,6 +27,20 @@ module ModelSubsets
     fieldsets.include?(name) if valid_subset?
   end
 
+  # Whether subset is included in a subsets scope
+  #
+  # @example Check if current subset is in :users subsets scope
+  #   person.in_subset_scope? :users
+  #
+  # @param [ Symbol ] name The subsets scope name
+  #
+  # @return [ Boolean ]
+  #
+  # @since 0.0.4
+  def in_subsets_scope? name
+    self.class.subsets_scope(name).include? subset.to_sym
+  end
+
   # Returns current subset content
   # An empty Hash is returned if subset is not defined
   #
