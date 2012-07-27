@@ -245,7 +245,7 @@ module ModelSubsets
     #
     # @since 0.0.2
     def subsets_scope name
-      subsets_scopes[name]
+      subsets_scopes[name] || []
     end
 
     # Return subsets scopes list
