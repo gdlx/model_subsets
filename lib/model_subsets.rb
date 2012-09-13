@@ -96,13 +96,18 @@ module ModelSubsets
     # @example Define fieldset :login including fields :username and :password
     #   fieldset :login, :username, :password
     #
-    # @param [ Symbol ] name  The fieldset name
-    # @param [ Array ]  *args Fields names
+    # @param [ Symbol ] name    The fieldset name
+    # @param [ Array ]  *args   Fields names
+    # @param [ Hash ]   options The fieldset options
+    #
+    # @option options [ Boolean ] :opt_in Whether fieldset is NOT included by default in subsets (Default: false = opt-out)
     #
     # @since 0.0.2
     def fieldset name, *args
-      @fieldsets ||= {}
-      @fieldsets[name] = args
+      options = args.last.is_a?(Hash) ? args.pop : {}
+
+      @fieldsets     ||= {}
+      @fieldsets[name] = { options: options, fields: args }
     end
     
     # Defines a subset
@@ -120,7 +125,7 @@ module ModelSubsets
     # @option options [ Symbol, Array ] :fieldsets Explicit fieldsets list. Overrides default list (all or herited)
     # @option options [ Symbol, Array ] :scopes    The scopes in which subset will be included
     # @option options [ Symbol, Array ] :extends   Parent subsets
-    # @option options [ Symbol, Array ] :with      Fieldsets to be added to herited fieldsets
+    # @option options [ Symbol, Array ] :add       Fieldsets to be added to default of herited fieldsets
     # @option options [ Symbol, Array ] :only      Filters fieldsets to remove fielsets not being in this list
     # @option options [ Symbol, Array ] :except    Filters fieldsets to remove fieldsets being in this list
     #
@@ -133,7 +138,6 @@ module ModelSubsets
 
       # Subset is an extension
       if options[:extends]
-
         # Force extends option to Array
         options[:extends] = [options[:extends]] unless options[:extends].is_a?(Array)
         options[:extends].each do |source_subset|
@@ -143,24 +147,24 @@ module ModelSubsets
           options = source_options.merge options
         end
 
-        # Handle additional fieldsets list
-        if options[:with]
-          options[:with] = [options[:with]] unless options[:with].is_a?(Array)
-          options[:fieldsets] |= options[:with]
-        end
-
-      # Include all fieldsets by default
+      # Include all opt-out fieldsets by default
       elsif options[:fieldsets].blank?
-        options[:fieldsets] = @fieldsets.keys
+        options[:fieldsets] = @fieldsets.reject{ |k,v| v[:options][:opt_in] }.keys
       end
 
-      # Handle inclusion list
+      # Handle additional fieldsets list
+      if options[:add]
+        options[:add] = [options[:add]] unless options[:add].is_a?(Array)
+        options[:fieldsets] |= options[:add]
+      end
+
+      # Handle fieldsets restriction list
       if options[:only]
         options[:only] = [options[:only]] unless options[:only].is_a?(Array)
         options[:fieldsets] &= options[:only]
       end
 
-      # Handle exclusion list
+      # Handle fieldsets exclusion list
       if options[:except]
         options[:except] = [options[:except]] unless options[:except].is_a?(Array)
         options[:fieldsets] -= options[:except]
@@ -177,7 +181,7 @@ module ModelSubsets
 
       # Cleanup
       options[:fieldsets] = options[:fieldsets].uniq & @fieldsets.keys
-      remove_options      = [:extends, :with, :only, :except]
+      remove_options      = [:extends, :add, :only, :except]
       options             = options.clone
       options.delete_if{ |key, value| remove_options.include?(key) }
 
@@ -200,7 +204,8 @@ module ModelSubsets
       return unless subsets.has_key?(name) && subsets[name].has_key?(:fieldsets)
       subset_fields = []
       subsets[name][:fieldsets].each do |fieldset|
-        fieldset = @fieldsets[fieldset].is_a?(Array) ? @fieldsets[fieldset] : [@fieldsets[fieldset]]
+        fields   = @fieldsets[fieldset][:fields]
+        fieldset = fields.is_a?(Array) ? fields : [fields]
         subset_fields |= fieldset
       end
       subset_fields.uniq
