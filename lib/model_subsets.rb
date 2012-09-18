@@ -145,7 +145,7 @@ module ModelSubsets
           source_options = @subsets[source_subset].clone
           source_options.delete :template
           options = source_options.merge options
-          options[:scopes] = [source_options[:scopes], options[:scopes]].flatten if source_options[:scopes]
+          options[:scopes] = [source_options[:scopes], options[:scopes]].flatten.uniq if source_options[:scopes]
         end
 
       # Include all opt-out fieldsets by default
