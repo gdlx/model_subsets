@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["gauthier.delacroix@gmail.com"]
   gem.description   = %q{ModelSubsets provides ability to split a single model into fields and properties subsets}
   gem.summary       = %q{Subsets management for Rails models}
-  gem.homepage      = "https://github.com/porecreat/model_subets"
+  gem.homepage      = "https://github.com/porecreat/model_subsets"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
