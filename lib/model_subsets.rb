@@ -153,12 +153,6 @@ module ModelSubsets
         options[:fieldsets] = @fieldsets.reject{ |k,v| v[:options][:opt_in] }.keys
       end
 
-      # Handle additional fieldsets list
-      if options[:add]
-        options[:add] = [options[:add]] unless options[:add].is_a?(Array)
-        options[:fieldsets] |= options[:add]
-      end
-
       # Handle fieldsets restriction list
       if options[:only]
         options[:only] = [options[:only]] unless options[:only].is_a?(Array)
@@ -169,6 +163,12 @@ module ModelSubsets
       if options[:except]
         options[:except] = [options[:except]] unless options[:except].is_a?(Array)
         options[:fieldsets] -= options[:except]
+      end
+
+      # Handle additional fieldsets list
+      if options[:add]
+        options[:add] = [options[:add]] unless options[:add].is_a?(Array)
+        options[:fieldsets] |= options[:add]
       end
 
       # Handle scopes
