@@ -177,6 +177,10 @@ module ModelSubsets
       options[:scopes].each do |subset_scope|
         @subsets_scopes[subset_scope] ||= []
         @subsets_scopes[subset_scope] << name unless options[:template]
+        if respond_to?(subset_scope)
+          (class << self; self; end).class_eval %Q"remove_method :#{subset_scope}"
+          scopes.delete subset_scope
+        end
         scope subset_scope, where(:subset.in => @subsets_scopes[subset_scope])
       end
 
