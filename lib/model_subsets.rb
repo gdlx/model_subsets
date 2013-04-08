@@ -226,29 +226,6 @@ module ModelSubsets
       @subsets.reject{ |name, options| options[:template] }
     end
 
-    # Provides grouped subsets list, formatted for use with grouped collection select
-    # 
-    # @return [ Array ]
-    #
-    # @since 0.0.1
-    def subsets_groups
-      groups     = {}
-      i18n_group = {}
-
-      subsets.each do |subset, options|
-        i18n_subset                   = self.human_attribute_name("subsets.#{subset}")
-        i18n_group[options[:group]] ||= self.human_attribute_name("subsets.#{options[:group]}")
-        groups[i18n_group[options[:group]]] ||= [options[:group], {}]
-        groups[i18n_group[options[:group]]].last[i18n_subset] = subset
-      end
-
-      # Rearrange groups
-      groups = groups.sort
-      groups.map do |group|
-        [group.last.first, group.first, group.last.last.sort]
-      end
-    end
-
     # Return subsets included of a subsets scope
     # 
     # @return [ Array ]
