@@ -186,6 +186,7 @@ module ModelSubsets
 
       # Cleanup
       options[:fieldsets] = options[:fieldsets].uniq & @fieldsets.keys
+      options[:group]   ||= :default
       remove_options      = [:extends, :add, :only, :except]
       options             = options.clone
       options.delete_if{ |key, value| remove_options.include?(key) }
@@ -235,7 +236,6 @@ module ModelSubsets
       i18n_group = {}
 
       subsets.each do |subset, options|
-        options[:group] = :default unless options[:group]
         i18n_subset                   = self.human_attribute_name("subsets.#{subset}")
         i18n_group[options[:group]] ||= self.human_attribute_name("subsets.#{options[:group]}")
         groups[i18n_group[options[:group]]] ||= [options[:group], {}]
